@@ -1,0 +1,9 @@
+[workspace]
+resolver = "2"
+members = [
+    "meadowlark-dsp-gpl",
+    "meadowlark-dsp-mit"
+]
+
+[workspace.dependencies]
+arrayvec = "0.7"

@@ -1,0 +1,14 @@
+[package]
+name = "meadowlark-dsp-gpl"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0"
+authors = [
+    "Billy Messenger <60663878+BillyDM@users.noreply.github.com>",
+]
+description = "GPLv3-licensed DSP library used in the Meadowlark DAW project"
+repository = "https://github.com/MeadowlarkDAW/meadowlark-dsp/meadowlark-dsp-gpl"
+keywords = ["dsp", "audio"]
+categories = ["multimedia::audio"]
+
+[dependencies]
