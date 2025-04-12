@@ -1,5 +1,5 @@
 use arrayvec::ArrayVec;
-use meadowlark_dsp_mit::filter::{
+use meadow_dsp_mit::filter::{
     one_pole_iir::{f32::OnePoleIirCoeff, f64::OnePoleIirCoeff as OnePoleIirCoeffF64},
     svf::{f32::SvfCoeff, f64::SvfCoeff as SvfCoeffF64},
 };

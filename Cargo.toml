@@ -1,8 +1,8 @@
 [workspace]
 resolver = "2"
 members = [
-    "meadowlark-dsp-agpl",
-    "meadowlark-dsp-mit"
+    "meadow-dsp-agpl",
+    "meadow-dsp-mit"
 ]
 
 [workspace.dependencies]

@@ -1,5 +1,5 @@
 use arrayvec::ArrayVec;
-use meadowlark_dsp_mit::filter::{one_pole_iir::f32::OnePoleIirState, svf::f32::SvfState};
+use meadow_dsp_mit::filter::{one_pole_iir::f32::OnePoleIirState, svf::f32::SvfState};
 
 use super::{
     coeff::{StateSyncInfo, MAX_ONE_POLE_FILTERS},

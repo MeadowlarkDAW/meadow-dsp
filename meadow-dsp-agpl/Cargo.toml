@@ -1,5 +1,5 @@
 [package]
-name = "meadowlark-dsp-agpl"
+name = "meadow-dsp-agpl"
 version = "0.1.0"
 edition = "2021"
 license = "GPL-3.0"
@@ -12,5 +12,5 @@ keywords = ["dsp", "audio"]
 categories = ["multimedia::audio"]
 
 [dependencies]
-meadowlark-dsp-mit = { path = "../meadowlark-dsp-mit", version = "0.1" }
+meadow-dsp-mit = { path = "../meadow-dsp-mit", version = "0.1" }
 arrayvec.workspace = true

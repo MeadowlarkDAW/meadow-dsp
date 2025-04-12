@@ -2,7 +2,7 @@ pub mod coeff;
 pub mod state;
 pub mod stereo;
 
-pub const DEFAULT_Q: f32 = meadowlark_dsp_mit::filter::svf::f64::Q_BUTTERWORTH_ORD2 as f32;
+pub const DEFAULT_Q: f32 = meadow_dsp_mit::filter::svf::f64::Q_BUTTERWORTH_ORD2 as f32;
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum FilterOrder {
