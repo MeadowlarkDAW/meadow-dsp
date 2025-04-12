@@ -320,13 +320,13 @@ impl MultiOrderBand {
             }
             FilterOrder::X6 => {
                 let coeffs = if is_lowpass {
-                    SvfCoeffF64::lowpass_ord4(
+                    SvfCoeffF64::lowpass_ord6(
                         params.cutoff_hz as f64,
                         params.q as f64,
                         sample_rate_recip,
                     )
                 } else {
-                    SvfCoeffF64::highpass_ord4(
+                    SvfCoeffF64::highpass_ord6(
                         params.cutoff_hz as f64,
                         params.q as f64,
                         sample_rate_recip,
@@ -346,13 +346,13 @@ impl MultiOrderBand {
             }
             FilterOrder::X8 => {
                 let coeffs = if is_lowpass {
-                    SvfCoeffF64::lowpass_ord4(
+                    SvfCoeffF64::lowpass_ord8(
                         params.cutoff_hz as f64,
                         params.q as f64,
                         sample_rate_recip,
                     )
                 } else {
-                    SvfCoeffF64::highpass_ord4(
+                    SvfCoeffF64::highpass_ord8(
                         params.cutoff_hz as f64,
                         params.q as f64,
                         sample_rate_recip,
