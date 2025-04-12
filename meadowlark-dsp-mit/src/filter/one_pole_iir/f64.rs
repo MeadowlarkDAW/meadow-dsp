@@ -1,10 +1,10 @@
 use std::f64::consts::PI;
 
-use super::f32::OnePoleCoeff as OnePoleCoeffF32;
+use super::f32::OnePoleIirCoeff as OnePoleIirCoeffF32;
 
 /// The coefficients for a single-pole IIR filter.
 #[derive(Default, Clone, Copy)]
-pub struct OnePoleCoeff {
+pub struct OnePoleIirCoeff {
     pub a0: f64,
     pub b1: f64,
 
@@ -12,7 +12,14 @@ pub struct OnePoleCoeff {
     pub m1: f64,
 }
 
-impl OnePoleCoeff {
+impl OnePoleIirCoeff {
+    pub const NO_OP: Self = Self {
+        a0: 0.0,
+        b1: 0.0,
+        m0: 1.0,
+        m1: 0.0,
+    };
+
     pub fn lowpass(cutoff_hz: f64, sample_rate_recip: f64) -> Self {
         let b1 = ((-2.0 * PI) * cutoff_hz * sample_rate_recip).exp();
         let a0 = 1.0 - b1;
@@ -37,8 +44,8 @@ impl OnePoleCoeff {
         }
     }
 
-    pub fn to_f32(self) -> OnePoleCoeffF32 {
-        OnePoleCoeffF32 {
+    pub fn to_f32(self) -> OnePoleIirCoeffF32 {
+        OnePoleIirCoeffF32 {
             a0: self.a0 as f32,
             b1: self.b1 as f32,
             m0: self.m0 as f32,
@@ -49,15 +56,20 @@ impl OnePoleCoeff {
 
 /// The state of a single-pole IIR filter.
 #[derive(Default, Clone, Copy)]
-pub struct OnePoleState {
+pub struct OnePoleIirState {
     z1: f64,
 }
 
-impl OnePoleState {
+impl OnePoleIirState {
     #[inline(always)]
-    pub fn tick(&mut self, input: f64, coeff: &OnePoleCoeff) -> f64 {
+    pub fn tick(&mut self, input: f64, coeff: &OnePoleIirCoeff) -> f64 {
         self.z1 = (coeff.a0 * input) + (coeff.b1 * self.z1);
         coeff.m0 * input + coeff.m1 * self.z1
+    }
+
+    #[inline(always)]
+    pub fn reset(&mut self) {
+        self.z1 = 0.0;
     }
 }
 
@@ -65,14 +77,14 @@ impl OnePoleState {
 pub mod simd {
     use std::{
         array,
-        simd::{f64x4, f64x2},
+        simd::{f64x2, f64x4},
     };
 
-    use super::{OnePoleCoeff, OnePoleState};
+    use super::{OnePoleIirCoeff, OnePoleIirState};
 
     /// The coefficients of two one-pole IIR filters packed into an SIMD vector.
     #[derive(Default, Clone, Copy)]
-    pub struct OnePoleCoeffx2 {
+    pub struct OnePoleIirCoeffx2 {
         pub a0: f64x2,
         pub b1: f64x2,
 
@@ -80,8 +92,8 @@ pub mod simd {
         pub m1: f64x2,
     }
 
-    impl OnePoleCoeffx2 {
-        pub const fn splat(coeffs: OnePoleCoeff) -> Self {
+    impl OnePoleIirCoeffx2 {
+        pub const fn splat(coeffs: OnePoleIirCoeff) -> Self {
             Self {
                 a0: f64x2::splat(coeffs.a0),
                 b1: f64x2::splat(coeffs.b1),
@@ -90,7 +102,7 @@ pub mod simd {
             }
         }
 
-        pub fn load(coeffs: &[OnePoleCoeff; 2]) -> Self {
+        pub fn load(coeffs: &[OnePoleIirCoeff; 2]) -> Self {
             Self {
                 a0: f64x2::from_array(array::from_fn(|i| coeffs[i].a0)),
                 b1: f64x2::from_array(array::from_fn(|i| coeffs[i].b1)),
@@ -102,7 +114,7 @@ pub mod simd {
 
     /// The coefficients of four one-pole IIR filters packed into an SIMD vector.
     #[derive(Default, Clone, Copy)]
-    pub struct OnePoleCoeffx4 {
+    pub struct OnePoleIirCoeffx4 {
         pub a0: f64x4,
         pub b1: f64x4,
 
@@ -110,8 +122,8 @@ pub mod simd {
         pub m1: f64x4,
     }
 
-    impl OnePoleCoeffx4 {
-        pub const fn splat(coeffs: OnePoleCoeff) -> Self {
+    impl OnePoleIirCoeffx4 {
+        pub const fn splat(coeffs: OnePoleIirCoeff) -> Self {
             Self {
                 a0: f64x4::splat(coeffs.a0),
                 b1: f64x4::splat(coeffs.b1),
@@ -120,7 +132,7 @@ pub mod simd {
             }
         }
 
-        pub fn load(coeffs: &[OnePoleCoeff; 4]) -> Self {
+        pub fn load(coeffs: &[OnePoleIirCoeff; 4]) -> Self {
             Self {
                 a0: f64x4::from_array(array::from_fn(|i| coeffs[i].a0)),
                 b1: f64x4::from_array(array::from_fn(|i| coeffs[i].b1)),
@@ -132,53 +144,63 @@ pub mod simd {
 
     /// The state of two single-pole IIR filters packed into an SIMD vector.
     #[derive(Default, Clone, Copy)]
-    pub struct OnePoleStatex2 {
+    pub struct OnePoleIirStatex2 {
         z1: f64x2,
     }
 
-    impl OnePoleStatex2 {
-        pub const fn splat(state: OnePoleState) -> Self {
+    impl OnePoleIirStatex2 {
+        pub const fn splat(state: OnePoleIirState) -> Self {
             Self {
                 z1: f64x2::splat(state.z1),
             }
         }
 
-        pub fn load(states: &[OnePoleState; 2]) -> Self {
+        pub fn load(states: &[OnePoleIirState; 2]) -> Self {
             Self {
                 z1: f64x2::from_array(array::from_fn(|i| states[i].z1)),
             }
         }
 
         #[inline(always)]
-        pub fn tick(&mut self, input: f64x2, coeff: &OnePoleCoeffx2) -> f64x2 {
+        pub fn tick(&mut self, input: f64x2, coeff: &OnePoleIirCoeffx2) -> f64x2 {
             self.z1 = (coeff.a0 * input) + (coeff.b1 * self.z1);
             coeff.m0 * input + coeff.m1 * self.z1
+        }
+
+        #[inline(always)]
+        pub fn reset(&mut self) {
+            self.z1 = f64x2::splat(0.0);
         }
     }
 
     /// The state of four single-pole IIR filters packed into an SIMD vector.
     #[derive(Default, Clone, Copy)]
-    pub struct OnePoleStatex4 {
+    pub struct OnePoleIirStatex4 {
         z1: f64x4,
     }
 
-    impl OnePoleStatex4 {
-        pub const fn splat(state: OnePoleState) -> Self {
+    impl OnePoleIirStatex4 {
+        pub const fn splat(state: OnePoleIirState) -> Self {
             Self {
                 z1: f64x4::splat(state.z1),
             }
         }
 
-        pub fn load(states: &[OnePoleState; 4]) -> Self {
+        pub fn load(states: &[OnePoleIirState; 4]) -> Self {
             Self {
                 z1: f64x4::from_array(array::from_fn(|i| states[i].z1)),
             }
         }
 
         #[inline(always)]
-        pub fn tick(&mut self, input: f64x4, coeff: &OnePoleCoeffx4) -> f64x4 {
+        pub fn tick(&mut self, input: f64x4, coeff: &OnePoleIirCoeffx4) -> f64x4 {
             self.z1 = (coeff.a0 * input) + (coeff.b1 * self.z1);
             coeff.m0 * input + coeff.m1 * self.z1
+        }
+
+        #[inline(always)]
+        pub fn reset(&mut self) {
+            self.z1 = f64x4::splat(0.0);
         }
     }
 }

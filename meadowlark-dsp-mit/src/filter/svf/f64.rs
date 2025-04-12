@@ -36,6 +36,15 @@ pub struct SvfCoeff {
 }
 
 impl SvfCoeff {
+    pub const NO_OP: Self = Self {
+        a1: 0.0,
+        a2: 0.0,
+        a3: 0.0,
+        m0: 1.0,
+        m1: 0.0,
+        m2: 0.0,
+    };
+
     pub fn lowpass_ord2(cutoff_hz: f64, q: f64, sample_rate_recip: f64) -> Self {
         let g = g(cutoff_hz, sample_rate_recip);
         let k = 1.0 / q;
@@ -208,6 +217,12 @@ impl SvfState {
 
         coeff.m0 * input + coeff.m1 * v1 + coeff.m2 * v2
     }
+
+    #[inline(always)]
+    pub fn reset(&mut self) {
+        self.ic1eq = 0.0;
+        self.ic2eq = 0.0;
+    }
 }
 
 fn g(cutoff_hz: f64, sample_rate_recip: f64) -> f64 {
@@ -356,6 +371,12 @@ pub mod simd {
 
             coeff.m0 * input + coeff.m1 * v1 + coeff.m2 * v2
         }
+
+        #[inline(always)]
+        pub fn reset(&mut self) {
+            self.ic1eq = f64x2::splat(0.0);
+            self.ic2eq = f64x2::splat(0.0);
+        }
     }
 
     /// The state of four SVF (state variable filter) models packed into an
@@ -402,6 +423,12 @@ pub mod simd {
             self.ic2eq = V_2 * v2 - self.ic2eq;
 
             coeff.m0 * input + coeff.m1 * v1 + coeff.m2 * v2
+        }
+
+        #[inline(always)]
+        pub fn reset(&mut self) {
+            self.ic1eq = f64x4::splat(0.0);
+            self.ic2eq = f64x4::splat(0.0);
         }
     }
 }

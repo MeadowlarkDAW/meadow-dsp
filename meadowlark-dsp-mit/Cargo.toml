@@ -16,4 +16,3 @@ default = ["portable-simd"]
 portable-simd = []
 
 [dependencies]
-arrayvec.workspace = true

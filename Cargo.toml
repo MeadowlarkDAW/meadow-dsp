@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "meadowlark-dsp-gpl",
+    "meadowlark-dsp-agpl",
     "meadowlark-dsp-mit"
 ]
 

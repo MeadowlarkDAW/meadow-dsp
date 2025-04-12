@@ -53,7 +53,11 @@ pub mod f32 {
     #[inline]
     pub fn linear_volume_to_amp_clamped(linear_volume: f32, amp_epsilon: f32) -> f32 {
         let v = linear_volume * linear_volume;
-        if v <= amp_epsilon { 0.0 } else { v }
+        if v <= amp_epsilon {
+            0.0
+        } else {
+            v
+        }
     }
 
     /// Map the raw amplitude (where `0.0` means mute and `1.0` means unity
@@ -63,7 +67,11 @@ pub mod f32 {
     /// returned.
     #[inline]
     pub fn amp_to_linear_volume_clamped(amp: f32, amp_epsilon: f32) -> f32 {
-        if amp <= amp_epsilon { 0.0 } else { amp.sqrt() }
+        if amp <= amp_epsilon {
+            0.0
+        } else {
+            amp.sqrt()
+        }
     }
 }
 
@@ -122,7 +130,11 @@ pub mod f64 {
     #[inline]
     pub fn linear_volume_to_amp_clamped(linear_volume: f64, amp_epsilon: f64) -> f64 {
         let v = linear_volume * linear_volume;
-        if v <= amp_epsilon { 0.0 } else { v }
+        if v <= amp_epsilon {
+            0.0
+        } else {
+            v
+        }
     }
 
     /// Map the raw amplitude (where `0.0` means mute and `1.0` means unity
@@ -132,6 +144,10 @@ pub mod f64 {
     /// returned.
     #[inline]
     pub fn amp_to_linear_volume_clamped(amp: f64, amp_epsilon: f64) -> f64 {
-        if amp <= amp_epsilon { 0.0 } else { amp.sqrt() }
+        if amp <= amp_epsilon {
+            0.0
+        } else {
+            amp.sqrt()
+        }
     }
 }
